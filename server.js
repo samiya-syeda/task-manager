@@ -85,4 +85,6 @@ app.delete('/api/tasks/:id', async (req, res) => {
 
 // Start Server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on  https://task-manager-p7x9.onrender.com));
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});
