@@ -7,84 +7,85 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({
-    origin:'*'
-}));
+app.use(cors());
 app.use(express.static('public'));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("✅ Connected to MongoDB Atlas"))
-    .catch(err => console.error("❌ MongoDB Connection Error:", err));
+    .catch(err => console.error("❌ MongoDB Error:", err));
 
-// Task Schema
+// --- SCHEMAS ---
+
 const taskSchema = new mongoose.Schema({
-    title: { type: String, required: true }, // Added 'required' for safety
-    priority: { type: String, default: 'Low' },
+    title: { type: String, required: true },
+    priority: { type: String, default: 'medium' },
     completed: { type: Boolean, default: false }
 });
-
 const Task = mongoose.model('Task', taskSchema);
+
+const habitSchema = new mongoose.Schema({
+    name: String,
+    logs: [String], // Array of dates like ["2026-04-01"]
+    color: { type: String, default: '#00ff88' }
+});
+const Habit = mongoose.model('Habit', habitSchema);
+
+const eventSchema = new mongoose.Schema({
+    title: String,
+    event_date: String,
+    event_time: String,
+    color: String
+});
+const Event = mongoose.model('Event', eventSchema);
+
+const journalSchema = new mongoose.Schema({
+    title: String,
+    content: String,
+    mood: String,
+    entry_date: String
+});
+const Journal = mongoose.model('Journal', journalSchema);
 
 // --- ROUTES ---
 
-// 1. Get all tasks
-app.get('/api/tasks', async (req, res) => {
-    try {
-        const tasks = await Task.find();
-        res.json(tasks);
-    } catch (err) {
-        res.status(500).json({ error: "Failed to fetch tasks" });
-    }
-});
-
-// 2. Create a new task
-app.post('/api/tasks', async (req, res) => {
-    try {
-        const newTask = new Task(req.body);
-        await newTask.save();
-        res.status(201).json(newTask); // 201 means "Created"
-    } catch (err) {
-        res.status(400).json({ error: "Failed to create task" });
-    }
-});
-
-// 3. Get count of pending tasks (For your notifications!)
-app.get('/api/tasks/pending-count', async (req, res) => {
-    try {
-        const count = await Task.countDocuments({ completed: false });
-        res.json({ pendingCount: count });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// 4. Update a task (e.g., mark as completed)
+// TASKS
+app.get('/api/tasks', async (req, res) => res.json(await Task.find()));
+app.post('/api/tasks', async (req, res) => res.json(await new Task(req.body).save()));
 app.put('/api/tasks/:id', async (req, res) => {
-    try {
-        const updatedTask = await Task.findByIdAndUpdate(
-            req.params.id, 
-            req.body, 
-            { new: true } // Returns the updated document
-        );
-        res.json(updatedTask);
-    } catch (err) {
-        res.status(400).json({ error: "Update failed" });
-    }
+    const updated = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
 });
-
-// 5. Delete a task
 app.delete('/api/tasks/:id', async (req, res) => {
-    try {
-        await Task.findByIdAndDelete(req.params.id);
-        res.json({ message: "Task deleted successfully" });
-    } catch (err) {
-        res.status(400).json({ error: "Delete failed" });
-    }
+    await Task.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted" });
 });
 
-// Start Server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+// HABITS
+app.get('/api/habits', async (req, res) => res.json(await Habit.find()));
+app.post('/api/habits', async (req, res) => res.json(await new Habit(req.body).save()));
+app.post('/api/habits/:id/log', async (req, res) => {
+    try {
+        const habit = await Habit.findById(req.params.id);
+        const { date } = req.body;
+        if (habit.logs.includes(date)) {
+            habit.logs = habit.logs.filter(d => d !== date);
+        } else {
+            habit.logs.push(date);
+        }
+        await habit.save();
+        res.json(habit);
+    } catch (err) { res.status(500).json(err); }
 });
+
+// CALENDAR/EVENTS
+app.get('/api/events', async (req, res) => res.json(await Event.find()));
+app.post('/api/events', async (req, res) => res.json(await new Event(req.body).save()));
+
+// JOURNAL
+app.get('/api/journal', async (req, res) => res.json(await Journal.find()));
+app.post('/api/journal', async (req, res) => res.json(await new Journal(req.body).save()));
+
+// --- SERVER START ---
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

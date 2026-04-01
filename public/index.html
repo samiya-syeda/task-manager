@@ -414,126 +414,173 @@
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-// --- CONFIG ---
-const API_BASE_URL = 'https://task-manager-p7x9.onrender.com/api/tasks';
+    // --- CONFIG ---
+const API_BASE_URL = 'https://task-manager-p7x9.onrender.com/api';
 
 // --- STATE ---
 let allTasks = [];
 let currentFilter = 'all';
 
 // --- INITIAL LOAD ---
-window.onload = loadTasks;
+window.onload = () => {
+    loadTasks();
+    loadHabits();
+    loadCalendar();
+    loadJournal();
+};
 
+// --- CORE LOAD FUNCTIONS ---
 async function loadTasks() {
-  try {
-    const res = await fetch(API_BASE_URL);
-    allTasks = await res.json();
-    renderTasks(); 
-    updateStats();
-  } catch(e) {
-    document.getElementById('task-list').innerHTML = '<div class="empty-state">❌ Error connecting to Render.</div>';
-  }
+    try {
+        const res = await fetch(`${API_BASE_URL}/tasks`);
+        allTasks = await res.json();
+        renderTasks();
+        updateStats();
+    } catch(e) { console.error("Task load error", e); }
 }
+
+async function loadHabits() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/habits`);
+        const habits = await res.json();
+        renderHabits(habits);
+    } catch(e) { console.error("Habit load error", e); }
+}
+
+async function loadCalendar() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/events`);
+        const events = await res.json();
+        renderCalendar(events);
+    } catch(e) { console.error("Calendar load error", e); }
+}
+
+async function loadJournal() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/journal`);
+        const entries = await res.json();
+        renderJournalList(entries);
+    } catch(e) { console.error("Journal load error", e); }
+}
+
+// --- RENDER FUNCTIONS (The Missing Part!) ---
 
 function renderTasks() {
-  const list = document.getElementById('task-list');
-  let tasks = allTasks;
+    const list = document.getElementById('task-list');
+    let tasks = allTasks;
+    if (currentFilter === 'pending') tasks = tasks.filter(t => !t.completed);
+    else if (currentFilter === 'completed') tasks = tasks.filter(t => t.completed);
+    else if (['high','medium','low'].includes(currentFilter)) tasks = tasks.filter(t => t.priority === currentFilter);
 
-  if (currentFilter === 'pending') tasks = tasks.filter(t => !t.completed);
-  else if (currentFilter === 'completed') tasks = tasks.filter(t => t.completed);
-  else if (['high','medium','low'].includes(currentFilter)) tasks = tasks.filter(t => t.priority === currentFilter);
+    document.getElementById('visible-count').textContent = `${tasks.length} tasks`;
+    if (!tasks.length) { list.innerHTML = '<div class="empty-state">No tasks found.</div>'; return; }
 
-  document.getElementById('visible-count').textContent = `${tasks.length} tasks`;
-
-  if (!tasks.length) {
-    list.innerHTML = '<div class="empty-state">No tasks found.</div>';
-    return;
-  }
-
-  list.innerHTML = tasks.map(t => `
-    <div class="task-item ${t.completed ? 'completed' : ''}">
-      <div class="task-check ${t.completed ? 'checked' : ''}" onclick="toggleTask('${t._id}', ${t.completed})"></div>
-      <div class="task-content">
-        <div class="task-title">${t.title}</div>
-      </div>
-      <div class="task-meta">
-        <span class="priority-badge priority-${t.priority}">${t.priority}</span>
-        <button class="btn btn-ghost" onclick="deleteTask('${t._id}')">🗑</button>
-      </div>
-    </div>`).join('');
+    list.innerHTML = tasks.map(t => `
+        <div class="task-item ${t.completed ? 'completed' : ''}">
+            <div class="task-check ${t.completed ? 'checked' : ''}" onclick="toggleTask('${t._id}', ${t.completed})"></div>
+            <div class="task-content"><div class="task-title">${t.title}</div></div>
+            <div class="task-meta">
+                <span class="priority-badge priority-${t.priority}">${t.priority}</span>
+                <button class="btn btn-ghost" onclick="deleteTask('${t._id}')">🗑</button>
+            </div>
+        </div>`).join('');
 }
 
-async function saveTask() {
-  const title = document.getElementById('task-title').value.trim();
-  const priority = document.getElementById('task-priority').value;
-  
-  if (!title) return toast('Title required', 'error');
+function renderHabits(habits) {
+    const grid = document.getElementById('habits-grid');
+    if (!habits.length) { grid.innerHTML = '<div class="empty-state">No habits tracked yet.</div>'; return; }
+    grid.innerHTML = habits.map(h => `
+        <div class="habit-row">
+            <div class="habit-color-dot" style="background:${h.color}"></div>
+            <div class="habit-name">${h.name}</div>
+            <div class="habit-streak">🔥 Streak: ${h.logs ? h.logs.length : 0}</div>
+        </div>`).join('');
+}
 
-  try {
-    await fetch(API_BASE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, priority, completed: false })
+function renderCalendar(events) {
+    const sidebar = document.getElementById('events-sidebar');
+    if (!events.length) { sidebar.innerHTML = '<div class="empty-state">No upcoming events.</div>'; return; }
+    sidebar.innerHTML = events.map(e => `
+        <div class="event-card">
+            <div class="event-info">
+                <div class="event-title">${e.title}</div>
+                <div class="event-time">${e.event_date} ${e.event_time || ''}</div>
+            </div>
+        </div>`).join('');
+}
+
+function renderJournalList(entries) {
+    const list = document.getElementById('journal-list');
+    if (!entries.length) { list.innerHTML = '<div class="empty-state">No journal entries.</div>'; return; }
+    list.innerHTML = entries.map(e => `
+        <div class="journal-entry-item" onclick="openJournalEntry('${e._id}')">
+            <div class="journal-entry-title">${e.title || 'Untitled'}</div>
+            <div class="journal-entry-preview">${e.content.substring(0, 30)}...</div>
+        </div>`).join('');
+}
+
+// --- TASK ACTIONS ---
+async function saveTask() {
+    const title = document.getElementById('task-title').value.trim();
+    const priority = document.getElementById('task-priority').value;
+    if (!title) return toast('Title required', 'error');
+    await fetch(`${API_BASE_URL}/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, priority, completed: false })
     });
     closeModal('task-modal');
     document.getElementById('task-title').value = '';
     loadTasks();
-    toast('Task created!', 'success');
-  } catch(e) { toast('Failed to save', 'error'); }
 }
 
 async function toggleTask(id, currentStatus) {
-  try {
-    await fetch(`${API_BASE_URL}/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ completed: !currentStatus })
+    await fetch(`${API_BASE_URL}/tasks/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed: !currentStatus })
     });
     loadTasks();
-  } catch(e) { toast('Update failed', 'error'); }
 }
 
 async function deleteTask(id) {
-  try {
-    await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' });
+    await fetch(`${API_BASE_URL}/tasks/${id}`, { method: 'DELETE' });
     loadTasks();
-    toast('Task deleted', 'info');
-  } catch(e) { toast('Delete failed', 'error'); }
 }
 
+// --- UTILS ---
 function updateStats() {
-  const total = allTasks.length;
-  const done = allTasks.filter(t => t.completed).length;
-  document.getElementById('stat-total').textContent = total;
-  document.getElementById('stat-done').textContent = done;
-  document.getElementById('stat-pending').textContent = total - done;
-  document.getElementById('stat-high').textContent = allTasks.filter(t => t.priority === 'high').length;
-  document.getElementById('task-badge').textContent = total - done;
+    const total = allTasks.length;
+    const done = allTasks.filter(t => t.completed).length;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-done').textContent = done;
+    document.getElementById('stat-pending').textContent = total - done;
+    document.getElementById('task-badge').textContent = total - done;
 }
 
-function filterTasks(f, el) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  currentFilter = f;
-  renderTasks();
+function switchView(view, el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${view}`).classList.add('active');
 }
 
-// --- MODAL UTILS ---
 function openAddModal() { document.getElementById('task-modal').style.display = 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-function switchView(view, el) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(`view-${view}`).classList.add('active');
+function filterTasks(f, el) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    currentFilter = f;
+    renderTasks();
 }
+
 function toast(msg, type) {
-  const c = document.getElementById('toast-container');
-  const t = document.createElement('div');
-  t.className = `toast toast-${type}`;
-  t.innerHTML = msg;
-  c.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.innerHTML = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
 }
 </script>
 </body>
