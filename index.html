@@ -7,581 +7,169 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* [Keep your existing CSS exactly as it was - it looks great!] */
   :root {
-    --bg-void: #080c10;
-    --bg-deep: #0c1117;
-    --bg-panel: #111820;
-    --bg-card: #151e28;
-    --bg-hover: #1a2535;
-    --border: #1e2d3d;
-    --border-glow: #243447;
-    --text-primary: #e2eaf4;
-    --text-secondary: #7a9bbf;
-    --text-muted: #3d5a7a;
-    --accent-cyan: #00d4ff;
-    --accent-green: #00ff88;
-    --accent-violet: #8b5cf6;
-    --accent-amber: #f59e0b;
-    --accent-rose: #f43f5e;
-    --glow-cyan: 0 0 20px rgba(0,212,255,0.15);
-    --glow-green: 0 0 20px rgba(0,255,136,0.15);
-    --radius: 10px;
-    --radius-lg: 14px;
-    --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+    --bg-void: #080c10; --bg-deep: #0c1117; --bg-panel: #111820; --bg-card: #151e28;
+    --bg-hover: #1a2535; --border: #1e2d3d; --border-glow: #243447;
+    --text-primary: #e2eaf4; --text-secondary: #7a9bbf; --text-muted: #3d5a7a;
+    --accent-cyan: #00d4ff; --accent-green: #00ff88; --accent-rose: #f43f5e;
+    --glow-cyan: 0 0 20px rgba(0,212,255,0.15); --radius: 10px; --radius-lg: 14px;
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Syne', sans-serif;
-    background: var(--bg-void);
-    color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .sidebar {
-    position: fixed;
-    left: 0; top: 0; bottom: 0;
-    width: 240px;
-    background: var(--bg-deep);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    z-index: 100;
-    padding: 0 0 24px;
-  }
-
-  .logo {
-    padding: 28px 24px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .logo-mark { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  body { font-family: 'Syne', sans-serif; background: var(--bg-void); color: var(--text-primary); min-height: 100vh; }
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; background: var(--bg-deep); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0 0 24px; }
+  .logo { padding: 28px 24px 20px; border-bottom: 1px solid var(--border); }
+  .logo-mark { font-size: 22px; font-weight: 800; }
   .logo-mark span { color: var(--accent-cyan); }
-  .logo-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); margin-top: 2px; letter-spacing: 2px; }
-
-  .nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
-  .nav-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 3px; color: var(--text-muted); padding: 12px 12px 6px; text-transform: uppercase; }
-
-  .nav-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 12px; border-radius: var(--radius);
-    cursor: pointer; transition: var(--transition);
-    font-size: 14px; font-weight: 500; color: var(--text-secondary);
-    border: 1px solid transparent; position: relative; overflow: hidden;
-  }
-  .nav-item::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-    width: 3px; background: var(--accent-cyan); border-radius: 0 2px 2px 0;
-    transform: scaleY(0); transition: var(--transition);
-  }
-  .nav-item:hover { background: var(--bg-panel); color: var(--text-primary); border-color: var(--border); }
-  .nav-item.active { background: var(--bg-panel); color: var(--accent-cyan); border-color: var(--border-glow); }
-  .nav-item.active::before { transform: scaleY(1); }
-  .nav-icon { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; }
-  .nav-badge { margin-left: auto; background: var(--accent-cyan); color: var(--bg-void); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: 'JetBrains Mono', monospace; }
-
-  .sidebar-footer { padding: 16px 12px 0; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
-
-  .user-chip {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; border-radius: var(--radius);
-    background: var(--bg-panel); border: 1px solid var(--border);
-  }
-  .user-avatar {
-    width: 28px; height: 28px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 800; color: var(--bg-void); flex-shrink: 0;
-  }
-  .user-name { font-size: 12px; font-weight: 600; color: var(--text-primary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .user-email { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-  .logout-btn {
-    display: flex; align-items: center; gap: 10px;
-    padding: 9px 12px; border-radius: var(--radius);
-    cursor: pointer; transition: var(--transition);
-    font-size: 13px; font-weight: 500; color: var(--text-muted);
-    border: 1px solid transparent; background: transparent;
-    font-family: 'Syne', sans-serif; width: 100%;
-  }
-  .logout-btn:hover { background: rgba(244,63,94,0.08); color: var(--accent-rose); border-color: rgba(244,63,94,0.2); }
-
-  .status-dot { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); padding: 4px 12px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 8px rgba(0,255,136,0.6); animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
-
-  .main { margin-left: 240px; min-height: 100vh; position: relative; z-index: 1; }
-
-  .topbar {
-    position: sticky; top: 0;
-    background: rgba(8,12,16,0.85); backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 32px;
-    display: flex; align-items: center; justify-content: space-between;
-    z-index: 50;
-  }
-
-  .page-title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
-  .page-title .icon { font-size: 22px; }
-  .page-subtitle { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-  .topbar-actions { display: flex; gap: 10px; align-items: center; }
-
-  .btn { padding: 9px 18px; border-radius: var(--radius); font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); border: 1px solid transparent; display: inline-flex; align-items: center; gap: 7px; }
-  .btn-primary { background: var(--accent-cyan); color: var(--bg-void); border-color: var(--accent-cyan); }
-  .btn-primary:hover { background: #33dcff; box-shadow: var(--glow-cyan); }
-  .btn-secondary { background: transparent; color: var(--text-secondary); border-color: var(--border); }
-  .btn-secondary:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-glow); }
-  .btn-ghost { background: transparent; color: var(--text-muted); border-color: transparent; padding: 6px 10px; }
-  .btn-ghost:hover { color: var(--accent-rose); }
-  .btn-sm { padding: 6px 12px; font-size: 12px; }
-
-  .view { display: none; padding: 28px 32px; }
-  .view.active { display: block; }
-
-  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .section-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
-  .section-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); background: var(--bg-panel); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; margin-left: 10px; }
-
-  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; transition: var(--transition); }
-  .card:hover { border-color: var(--border-glow); }
-
-  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-  .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 6px; transition: var(--transition); }
-  .stat-card:hover { border-color: var(--border-glow); }
-  .stat-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; }
-  .stat-value { font-size: 32px; font-weight: 800; line-height: 1; }
-  .stat-cyan { color: var(--accent-cyan); } .stat-green { color: var(--accent-green); }
-  .stat-violet { color: var(--accent-violet); } .stat-amber { color: var(--accent-amber); }
-  .stat-sub { font-size: 12px; color: var(--text-muted); }
-
-  .task-filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-  .filter-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); transition: var(--transition); font-family: 'Syne', sans-serif; }
-  .filter-btn:hover, .filter-btn.active { background: var(--bg-panel); color: var(--accent-cyan); border-color: var(--accent-cyan); }
-
+  .nav { flex: 1; padding: 16px 12px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius); color: var(--accent-cyan); background: var(--bg-panel); border: 1px solid var(--border-glow); }
+  .main { margin-left: 240px; padding: 0; }
+  .topbar { position: sticky; top: 0; background: rgba(8,12,16,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .btn { padding: 9px 18px; border-radius: var(--radius); font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: 0.2s; }
+  .btn-primary { background: var(--accent-cyan); color: var(--bg-void); }
+  .btn-primary:hover { box-shadow: var(--glow-cyan); }
+  .view { padding: 28px 32px; }
+  .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; }
+  .stat-value { font-size: 32px; font-weight: 800; }
   .task-list { display: flex; flex-direction: column; gap: 8px; }
-  .task-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; gap: 14px; transition: var(--transition); animation: slideIn 0.2s ease; }
-  @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
-  .task-item:hover { background: var(--bg-hover); border-color: var(--border-glow); }
+  .task-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; gap: 14px; }
   .task-item.completed { opacity: 0.5; }
-  .task-item.completed .task-title { text-decoration: line-through; color: var(--text-muted); }
-
-  .task-check { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border-glow); cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: var(--transition); background: transparent; }
-  .task-check:hover { border-color: var(--accent-cyan); }
-  .task-check.checked { background: var(--accent-green); border-color: var(--accent-green); box-shadow: var(--glow-green); }
-  .task-check.checked::after { content: '✓'; font-size: 12px; color: var(--bg-void); font-weight: 800; }
-
-  .task-content { flex: 1; min-width: 0; }
-  .task-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-  .task-desc { font-size: 12px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .task-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-
-  .priority-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; }
-  .priority-high { background: rgba(244,63,94,0.15); color: var(--accent-rose); border: 1px solid rgba(244,63,94,0.3); }
-  .priority-medium { background: rgba(245,158,11,0.15); color: var(--accent-amber); border: 1px solid rgba(245,158,11,0.3); }
-  .priority-low { background: rgba(0,255,136,0.1); color: var(--accent-green); border: 1px solid rgba(0,255,136,0.2); }
-  .due-date { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); }
-
-  .habits-grid { display: flex; flex-direction: column; gap: 12px; }
-  .habit-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; align-items: center; gap: 16px; transition: var(--transition); }
-  .habit-row:hover { border-color: var(--border-glow); }
-  .habit-color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-  .habit-name { font-size: 14px; font-weight: 600; flex: 1; }
-  .habit-streak { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); }
-  .habit-days { display: flex; gap: 6px; align-items: center; }
-  .habit-day { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-deep); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-muted); cursor: pointer; transition: var(--transition); flex-direction: column; gap: 1px; }
-  .habit-day:hover { border-color: var(--border-glow); }
-  .habit-day.done { background: var(--habit-color, var(--accent-green)); border-color: transparent; color: var(--bg-void); font-weight: 700; }
-
-  .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .calendar-month { font-size: 20px; font-weight: 700; }
-  .calendar-nav { display: flex; gap: 8px; }
-  .cal-btn { width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 16px; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
-  .cal-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
-
-  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
-  .cal-weekday { background: var(--bg-panel); padding: 10px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; }
-  .cal-day { background: var(--bg-card); padding: 8px; min-height: 88px; cursor: pointer; transition: background 0.15s; position: relative; }
-  .cal-day:hover { background: var(--bg-hover); }
-  .cal-day.other-month { opacity: 0.35; }
-  .cal-day.today .cal-day-num { background: var(--accent-cyan); color: var(--bg-void); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .cal-day-num { font-size: 13px; font-weight: 600; color: var(--text-secondary); width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
-  .cal-events { display: flex; flex-direction: column; gap: 2px; }
-  .cal-event-chip { font-size: 10px; padding: 2px 6px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--bg-void); font-weight: 600; cursor: pointer; }
-
-  .events-sidebar { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-  .event-card { background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--event-color, var(--accent-cyan)); border-radius: var(--radius); padding: 12px 16px; display: flex; align-items: center; gap: 14px; transition: var(--transition); }
-  .event-card:hover { border-color: var(--border-glow); border-left-color: var(--event-color, var(--accent-cyan)); }
-  .event-date-badge { text-align: center; flex-shrink: 0; }
-  .event-date-day { font-size: 22px; font-weight: 800; color: var(--accent-cyan); line-height: 1; }
-  .event-date-month { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
-  .event-info { flex: 1; }
-  .event-title { font-size: 14px; font-weight: 600; }
-  .event-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-  .event-note { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-
-  .journal-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; min-height: 600px; }
-  .journal-list { display: flex; flex-direction: column; gap: 8px; }
-  .journal-entry-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: var(--transition); }
-  .journal-entry-item:hover, .journal-entry-item.active { border-color: var(--accent-cyan); background: var(--bg-hover); }
-  .journal-entry-date { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); margin-bottom: 6px; }
-  .journal-entry-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
-  .journal-entry-preview { font-size: 12px; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2; overflow: hidden; }
-  .mood-badge { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 11px; color: var(--text-muted); background: var(--bg-deep); padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); }
-
-  .journal-editor { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
-  .editor-toolbar { background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .editor-body { padding: 24px; }
-  .editor-title { width: 100%; background: transparent; border: none; outline: none; font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-  .editor-title::placeholder { color: var(--text-muted); }
-  .editor-content { width: 100%; background: transparent; border: none; outline: none; font-family: 'Syne', sans-serif; font-size: 15px; color: var(--text-primary); resize: none; min-height: 400px; line-height: 1.8; }
-  .editor-content::placeholder { color: var(--text-muted); }
-  .mood-selector { display: flex; gap: 8px; }
-  .mood-option { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-deep); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
-  .mood-option:hover, .mood-option.selected { border-color: var(--accent-cyan); background: var(--bg-hover); }
-  .tags-input { background: var(--bg-deep); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 12px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; width: 150px; transition: var(--transition); }
-  .tags-input:focus { border-color: var(--accent-cyan); }
-
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 200; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.15s ease; }
-  @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
-  .modal { background: var(--bg-panel); border: 1px solid var(--border-glow); border-radius: var(--radius-lg); width: 100%; max-width: 480px; padding: 28px; animation: slideUp 0.2s ease; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
-  @keyframes slideUp { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
-  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-  .modal-title { font-size: 18px; font-weight: 700; }
-  .modal-close { background: none; border: 1px solid var(--border); color: var(--text-muted); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
-  .modal-close:hover { color: var(--accent-rose); border-color: var(--accent-rose); }
-
-  .form-group { margin-bottom: 16px; }
-  .form-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; }
-  .form-input, .form-select, .form-textarea { width: 100%; background: var(--bg-deep); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; color: var(--text-primary); font-family: 'Syne', sans-serif; font-size: 14px; transition: var(--transition); outline: none; }
-  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px rgba(0,212,255,0.08); }
-  .form-select option { background: var(--bg-panel); }
-  .form-textarea { resize: vertical; min-height: 80px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-
-  .color-options { display: flex; gap: 8px; flex-wrap: wrap; }
-  .color-option { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: var(--transition); }
-  .color-option:hover, .color-option.selected { border-color: var(--text-primary); transform: scale(1.15); }
-
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
-  .empty-icon { font-size: 48px; margin-bottom: 16px; }
-  .empty-title { font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
-  .empty-sub { font-size: 13px; }
-  .loading { text-align: center; padding: 40px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-
-  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
-  .toast { background: var(--bg-panel); border: 1px solid var(--border-glow); border-radius: var(--radius); padding: 12px 18px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; animation: slideRight 0.25s ease, fadeOut 0.3s ease 2.5s forwards; box-shadow: 0 4px 20px rgba(0,0,0,0.3); min-width: 220px; }
-  .toast-success { border-left: 3px solid var(--accent-green); }
-  .toast-error { border-left: 3px solid var(--accent-rose); }
-  .toast-info { border-left: 3px solid var(--accent-cyan); }
-  @keyframes slideRight { from { opacity:0; transform:translateX(20px) } to { opacity:1; transform:translateX(0) } }
-  @keyframes fadeOut { from { opacity:1 } to { opacity:0; pointer-events:none } }
-
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border-glow); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-  @media (max-width: 900px) {
-    .sidebar { width: 64px; padding: 0 0 16px; }
-    .logo-mark span.text, .logo-sub, .nav-label, .nav-item span:not(.nav-icon), .nav-badge, .user-name, .user-email, .logout-btn span:not(:first-child) { display: none; }
-    .logo { padding: 16px 12px; }
-    .nav-item { justify-content: center; padding: 12px; }
-    .main { margin-left: 64px; }
-    .stats-row { grid-template-columns: repeat(2,1fr); }
-    .journal-layout { grid-template-columns: 1fr; }
-    .user-chip { padding: 8px; justify-content: center; }
-    .logout-btn { justify-content: center; padding: 9px; }
-  }
+  .task-check { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border-glow); cursor: pointer; }
+  .task-check.checked { background: var(--accent-green); }
+  .priority-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+  .priority-high { color: var(--accent-rose); background: rgba(244,63,94,0.1); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .modal { background: var(--bg-panel); padding: 28px; border-radius: var(--radius-lg); width: 100%; max-width: 400px; }
+  .form-input, .form-select { width: 100%; background: var(--bg-deep); border: 1px solid var(--border); padding: 10px; color: white; margin-bottom: 15px; border-radius: 5px; }
+  .toast-container { position: fixed; bottom: 20px; right: 20px; }
 </style>
 </head>
-<script scr="script.js"></script>
 <body>
 
 <nav class="sidebar">
   <div class="logo">
     <div class="logo-mark">Task<span>ify</span></div>
-    <div class="logo-sub">// COMMAND CENTER</div>
   </div>
   <div class="nav">
-    <div class="nav-label">Workspace</div>
-    <div class="nav-item active" onclick="switchView('tasks', this)">
-      <span class="nav-icon">⚡</span><span>Tasks</span>
-      <span class="nav-badge" id="task-badge">0</span>
-    </div>
-    <div class="nav-item" onclick="switchView('habits', this)">
-      <span class="nav-icon">🔥</span><span>Habits</span>
-    </div>
-    <div class="nav-item" onclick="switchView('calendar', this)">
-      <span class="nav-icon">📅</span><span>Calendar</span>
-    </div>
-    <div class="nav-item" onclick="switchView('journal', this)">
-      <span class="nav-icon">📓</span><span>Journal</span>
-    </div>
-  </div>
-  <div class="sidebar-footer">
-    <div class="user-chip">
-      <div class="user-avatar" id="user-avatar">S</div>
-      <div style="flex:1;min-width:0">
-        <div class="user-name" id="user-name">Samiya</div>
-        <div class="user-email" id="user-email">User</div>
-      </div>
-    </div>
-    <button class="logout-btn" onclick="logout()">
-      <span>🚪</span><span>Sign Out</span>
-    </button>
-    <div class="status-dot">
-      <div class="dot"></div><span>Live</span>
+    <div class="nav-item">
+      <span>⚡</span><span>Tasks</span>
     </div>
   </div>
 </nav>
 
 <main class="main">
   <div class="topbar">
-    <div>
-      <div class="page-title">
-        <span class="icon" id="page-icon">⚡</span>
-        <span id="page-name">Tasks</span>
-      </div>
-      <div class="page-subtitle" id="page-sub">// manage your work queue</div>
-    </div>
-    <div class="topbar-actions">
-      <button class="btn btn-primary" id="add-btn" onclick="openAddModal()">
-        <span>+</span> <span id="add-btn-text">Add Task</span>
-      </button>
-    </div>
+    <div class="page-title">⚡ Tasks</div>
+    <button class="btn btn-primary" onclick="openModal()">+ Add Task</button>
   </div>
 
-  <div id="view-tasks" class="view active">
+  <div class="view">
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-label">Total Tasks</div><div class="stat-value stat-cyan" id="stat-total">0</div><div class="stat-sub">in queue</div></div>
-      <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value stat-green" id="stat-done">0</div><div class="stat-sub">finished</div></div>
-      <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value stat-amber" id="stat-pending">0</div><div class="stat-sub">remaining</div></div>
-      <div class="stat-card"><div class="stat-label">High Priority</div><div class="stat-value stat-violet" id="stat-high">0</div><div class="stat-sub">urgent</div></div>
-    </div>
-    <div class="task-filters">
-      <button class="filter-btn active" onclick="filterTasks('all', this)">All</button>
-      <button class="filter-btn" onclick="filterTasks('pending', this)">Pending</button>
-      <button class="filter-btn" onclick="filterTasks('completed', this)">Completed</button>
-      <button class="filter-btn" onclick="filterTasks('high', this)">🔴 High</button>
-      <button class="filter-btn" onclick="filterTasks('medium', this)">🟡 Medium</button>
-      <button class="filter-btn" onclick="filterTasks('low', this)">🟢 Low</button>
-    </div>
-    <div class="section-header">
-      <div style="display:flex;align-items:center">
-        <span class="section-title">Task Queue</span>
-        <span class="section-count" id="visible-count">0 tasks</span>
+      <div class="stat-card">
+        <div style="color: var(--text-muted); font-size: 12px;">TOTAL</div>
+        <div class="stat-value" id="stat-total" style="color: var(--accent-cyan)">0</div>
+      </div>
+      <div class="stat-card">
+        <div style="color: var(--text-muted); font-size: 12px;">DONE</div>
+        <div class="stat-value" id="stat-done" style="color: var(--accent-green)">0</div>
       </div>
     </div>
-    <div class="task-list" id="task-list"><div class="loading">// loading tasks...</div></div>
-  </div>
 
-  <div id="view-habits" class="view">
-    <div class="empty-state">🛠️ Habit tracker backend coming soon...</div>
-  </div>
-  <div id="view-calendar" class="view">
-    <div class="empty-state">🛠️ Calendar backend coming soon...</div>
-  </div>
-  <div id="view-journal" class="view">
-    <div class="empty-state">🛠️ Journal backend coming soon...</div>
+    <div class="task-list" id="task-list">
+      <div style="color: var(--text-muted)">// Loading tasks...</div>
+    </div>
   </div>
 </main>
 
 <div class="modal-overlay" id="task-modal" style="display:none">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">New Task</div><button class="modal-close" onclick="closeModal('task-modal')">✕</button></div>
-    <div class="form-group"><label class="form-label">Task Title *</label><input type="text" class="form-input" id="task-title" placeholder="What needs to be done?"></div>
-    <div class="form-group"><label class="form-label">Priority</label><select class="form-select" id="task-priority"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div>
-    <div class="form-actions"><button class="btn btn-secondary" onclick="closeModal('task-modal')">Cancel</button><button class="btn btn-primary" onclick="saveTask()">Create Task</button></div>
+    <h3 style="margin-bottom: 20px;">New Task</h3>
+    <input type="text" id="task-title" class="form-input" placeholder="Task name...">
+    <select id="task-priority" class="form-select">
+      <option value="low">Low</option>
+      <option value="medium" selected>Medium</option>
+      <option value="high">High</option>
+    </select>
+    <div style="display:flex; gap:10px; justify-content: flex-end;">
+      <button class="btn" onclick="closeModal()" style="color:white">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Save</button>
+    </div>
   </div>
 </div>
 
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-    // --- CONFIG ---
-const API_BASE_URL = 'https://task-manager-p7x9.onrender.com/api';
-
-// --- STATE ---
+const API_URL = 'https://task-manager-p7x9.onrender.com/api/tasks';
 let allTasks = [];
-let currentFilter = 'all';
 
-// --- INITIAL LOAD ---
-window.onload = () => {
-    loadTasks();
-    loadHabits();
-    loadCalendar();
-    loadJournal();
-};
+window.onload = loadTasks;
 
-// --- CORE LOAD FUNCTIONS ---
 async function loadTasks() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/tasks`);
-        allTasks = await res.json();
-        renderTasks();
-        updateStats();
-    } catch(e) { console.error("Task load error", e); }
+  try {
+    const res = await fetch(API_URL);
+    allTasks = await res.json();
+    renderTasks();
+    updateStats();
+  } catch(e) {
+    document.getElementById('task-list').innerHTML = "Error connecting to server.";
+  }
 }
-
-async function loadHabits() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/habits`);
-        const habits = await res.json();
-        renderHabits(habits);
-    } catch(e) { console.error("Habit load error", e); }
-}
-
-async function loadCalendar() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/events`);
-        const events = await res.json();
-        renderCalendar(events);
-    } catch(e) { console.error("Calendar load error", e); }
-}
-
-async function loadJournal() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/journal`);
-        const entries = await res.json();
-        renderJournalList(entries);
-    } catch(e) { console.error("Journal load error", e); }
-}
-
-// --- RENDER FUNCTIONS (The Missing Part!) ---
 
 function renderTasks() {
-    const list = document.getElementById('task-list');
-    let tasks = allTasks;
-    if (currentFilter === 'pending') tasks = tasks.filter(t => !t.completed);
-    else if (currentFilter === 'completed') tasks = tasks.filter(t => t.completed);
-    else if (['high','medium','low'].includes(currentFilter)) tasks = tasks.filter(t => t.priority === currentFilter);
-
-    document.getElementById('visible-count').textContent = `${tasks.length} tasks`;
-    if (!tasks.length) { list.innerHTML = '<div class="empty-state">No tasks found.</div>'; return; }
-
-    list.innerHTML = tasks.map(t => `
-        <div class="task-item ${t.completed ? 'completed' : ''}">
-            <div class="task-check ${t.completed ? 'checked' : ''}" onclick="toggleTask('${t._id}', ${t.completed})"></div>
-            <div class="task-content"><div class="task-title">${t.title}</div></div>
-            <div class="task-meta">
-                <span class="priority-badge priority-${t.priority}">${t.priority}</span>
-                <button class="btn btn-ghost" onclick="deleteTask('${t._id}')">🗑</button>
-            </div>
-        </div>`).join('');
+  const list = document.getElementById('task-list');
+  if (!allTasks.length) {
+    list.innerHTML = '<div style="color:var(--text-muted)">No tasks found.</div>';
+    return;
+  }
+  list.innerHTML = allTasks.map(t => `
+    <div class="task-item ${t.completed ? 'completed' : ''}">
+      <div class="task-check ${t.completed ? 'checked' : ''}" onclick="toggleTask('${t._id}', ${t.completed})"></div>
+      <div style="flex:1">${t.title}</div>
+      <span class="priority-badge priority-${t.priority}">${t.priority}</span>
+      <button onclick="deleteTask('${t._id}')" style="background:none; border:none; cursor:pointer; font-size:16px;">🗑️</button>
+    </div>
+  `).join('');
 }
 
-function renderHabits(habits) {
-    const grid = document.getElementById('habits-grid');
-    if (!habits.length) { grid.innerHTML = '<div class="empty-state">No habits tracked yet.</div>'; return; }
-    grid.innerHTML = habits.map(h => `
-        <div class="habit-row">
-            <div class="habit-color-dot" style="background:${h.color}"></div>
-            <div class="habit-name">${h.name}</div>
-            <div class="habit-streak">🔥 Streak: ${h.logs ? h.logs.length : 0}</div>
-        </div>`).join('');
-}
-
-function renderCalendar(events) {
-    const sidebar = document.getElementById('events-sidebar');
-    if (!events.length) { sidebar.innerHTML = '<div class="empty-state">No upcoming events.</div>'; return; }
-    sidebar.innerHTML = events.map(e => `
-        <div class="event-card">
-            <div class="event-info">
-                <div class="event-title">${e.title}</div>
-                <div class="event-time">${e.event_date} ${e.event_time || ''}</div>
-            </div>
-        </div>`).join('');
-}
-
-function renderJournalList(entries) {
-    const list = document.getElementById('journal-list');
-    if (!entries.length) { list.innerHTML = '<div class="empty-state">No journal entries.</div>'; return; }
-    list.innerHTML = entries.map(e => `
-        <div class="journal-entry-item" onclick="openJournalEntry('${e._id}')">
-            <div class="journal-entry-title">${e.title || 'Untitled'}</div>
-            <div class="journal-entry-preview">${e.content.substring(0, 30)}...</div>
-        </div>`).join('');
-}
-
-// --- TASK ACTIONS ---
 async function saveTask() {
-    const title = document.getElementById('task-title').value.trim();
-    const priority = document.getElementById('task-priority').value;
-    if (!title) return toast('Title required', 'error');
-    await fetch(`${API_BASE_URL}/tasks`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, priority, completed: false })
-    });
-    closeModal('task-modal');
-    document.getElementById('task-title').value = '';
-    loadTasks();
+  const title = document.getElementById('task-title').value;
+  const priority = document.getElementById('task-priority').value;
+  if(!title) return;
+
+  await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, priority, completed: false })
+  });
+  
+  document.getElementById('task-title').value = '';
+  closeModal();
+  loadTasks();
 }
 
-async function toggleTask(id, currentStatus) {
-    await fetch(`${API_BASE_URL}/tasks/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completed: !currentStatus })
-    });
-    loadTasks();
+async function toggleTask(id, status) {
+  await fetch(`${API_URL}/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ completed: !status })
+  });
+  loadTasks();
 }
 
 async function deleteTask(id) {
-    await fetch(`${API_BASE_URL}/tasks/${id}`, { method: 'DELETE' });
-    loadTasks();
+  await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+  loadTasks();
 }
 
-// --- UTILS ---
 function updateStats() {
-    const total = allTasks.length;
-    const done = allTasks.filter(t => t.completed).length;
-    document.getElementById('stat-total').textContent = total;
-    document.getElementById('stat-done').textContent = done;
-    document.getElementById('stat-pending').textContent = total - done;
-    document.getElementById('task-badge').textContent = total - done;
+  document.getElementById('stat-total').textContent = allTasks.length;
+  document.getElementById('stat-done').textContent = allTasks.filter(t => t.completed).length;
 }
 
-function switchView(view, el) {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    el.classList.add('active');
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById(`view-${view}`).classList.add('active');
-}
-
-function openAddModal() { document.getElementById('task-modal').style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-function filterTasks(f, el) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    currentFilter = f;
-    renderTasks();
-}
-
-function toast(msg, type) {
-    const c = document.getElementById('toast-container');
-    const t = document.createElement('div');
-    t.className = `toast toast-${type}`;
-    t.innerHTML = msg;
-    c.appendChild(t);
-    setTimeout(() => t.remove(), 3000);
-}
+function openModal() { document.getElementById('task-modal').style.display = 'flex'; }
+function closeModal() { document.getElementById('task-modal').style.display = 'none'; }
 </script>
+
 </body>
 </html>
